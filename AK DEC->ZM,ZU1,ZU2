@@ -1,5 +1,4 @@
 ORG  800h
-;Pobranie liczby
 LXI H,tekst1
 RST 3
 LXI H,tekst2
@@ -10,12 +9,27 @@ LXI H,tekst4
 RST 3
 LXI H,tekst5
 RST 3
+
+;Pobranie liczby
 RST 2
 MOV B,A
-RST 2
+XRI 43
+JZ znakok
+MOV A,B
+XRI 45
+JNZ blad
+
+znakok RST 2
 MOV C,A
-RST 2
+XRI 48
+JZ okej
+MOV A,C
+XRI 49
+JNZ blad
+
+okej RST 2
 MOV D,A
+
 RST 2
 MOV E,A
 
@@ -26,7 +40,7 @@ RST 1
 MVI A,13
 RST 1
 
-;sprawdzanie
+;sprawdzanie znaku
 
 MOV A,B
 SUI 2Dh
@@ -54,10 +68,16 @@ niesto MVI C,0
 sto MOV A,E
 XRI 48
 MOV E,A
+SUI 10
+JP blad
 
 MOV A,D
 XRI 48
 MOV D,A
+SUI 10
+JP blad
+
+MOV A,D
 ADD D
 ADD D
 ADD D
@@ -75,12 +95,26 @@ ADD E
 
 MOV C,A
 MOV B,A
+
+MOV A,H
+SUI 1
+JM testuj
+MOV A,B
+SUI 129
+JP blad
+JMP poprawnie
+testuj MOV A,B
+SUI 128
+JP blad
+
+poprawnie MOV A,B
 JMP pomin
+
 powtorz MVI A,'0'
 RST 1
 MOV A,B
-pomin ANI 64
 
+pomin ANI 64
 JZ siedem0
 MVI A,'1'
 RST 1
@@ -186,11 +220,17 @@ JZ ZUCZY64
 JMP ZU2_CZY64
 
 koniec HLT
+
+blad LXI H,error
+RST 3
+JMP koniec
+
 tekst1 DB 'Konwerter liczby dziesietnej 8bit@'
 tekst2 DB ' ze znakiem na ZM, ZU1 i ZU2@'
 tekst3 DB 10,13,'Wymagany format: znak i 3 @'
 tekst4 DB 'cyfry(czyli z zakresu od +127 do@'
-tekst5 DB ' -128',10,13,'Podaj liczbe: @'
+tekst5 DB ' -128)',10,13,'Podaj liczbe: @'
+error DB 10,13,'Zle podana liczba. Koniec.@'
 
 
 
@@ -333,6 +373,10 @@ J64
 	 JM ZU2_CZY32  
 ;                                                                                    
 NJ64  
+	 MOV B,A  
+	 MVI A,'1' ;WYPISANIE ZNAKU MINUS  
+	 RST 1 
+	 MOV A,B
 	 ADI 64  
 	 CALL WYP0  
 	 MOV B,A  
