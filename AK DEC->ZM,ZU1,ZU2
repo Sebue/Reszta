@@ -1,0 +1,459 @@
+ORG  800h
+;Pobranie liczby
+LXI H,tekst1
+RST 3
+LXI H,tekst2
+RST 3
+LXI H,tekst3
+RST 3
+LXI H,tekst4
+RST 3
+LXI H,tekst5
+RST 3
+RST 2
+MOV B,A
+RST 2
+MOV C,A
+RST 2
+MOV D,A
+RST 2
+MOV E,A
+
+MVI L,3 
+
+MVI A,10
+RST 1
+MVI A,13
+RST 1
+
+;sprawdzanie
+
+MOV A,B
+SUI 2Dh
+JP minus
+
+MVI A,'0'
+RST 1
+MVI H,0
+JMP dalej
+
+minus MVI A,'1'
+RST 1
+MVI H,1
+
+dalej MOV A,C
+SUI 48
+ANI 1
+JZ niesto
+
+MVI C,100
+JMP sto
+
+niesto MVI C,0
+
+sto MOV A,E
+XRI 48
+MOV E,A
+
+MOV A,D
+XRI 48
+MOV D,A
+ADD D
+ADD D
+ADD D
+
+ADD D
+ADD D
+ADD D
+
+ADD D
+ADD D
+ADD D
+
+ADD C
+ADD E
+
+MOV C,A
+MOV B,A
+JMP pomin
+powtorz MVI A,'0'
+RST 1
+MOV A,B
+pomin ANI 64
+
+JZ siedem0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 64
+MOV B,A
+JMP siedem
+
+siedem0 MVI A,'0'
+RST 1
+MOV A,B
+siedem ANI 32
+
+JZ szesc0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 32
+MOV B,A
+JMP szesc
+
+szesc0 MVI A,'0'
+RST 1
+MOV A,B
+szesc ANI 16
+
+JZ piec0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 16
+MOV B,A
+JMP piec
+
+piec0 MVI A,'0'
+RST 1
+MOV A,B
+piec ANI 8
+
+JZ cztery0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 8
+MOV B,A
+JMP cztery
+
+cztery0 MVI A,'0'
+RST 1
+MOV A,B
+cztery ANI 4
+
+JZ trzy0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 4
+MOV B,A
+JMP trzy
+
+trzy0 MVI A,'0'
+RST 1
+MOV A,B
+trzy ANI 2
+
+JZ dwa0
+MVI A,'1'
+RST 1
+MOV A,B
+SUI 2
+MOV B,A
+JMP dwa
+
+dwa0 MVI A,'0'
+RST 1
+MOV A,B
+dwa ANI 1
+
+JZ jeden0
+MVI A,'1'
+RST 1
+JMP jeden
+
+jeden0 MVI A,'0'
+RST 1
+jeden
+
+CZY_KONIEC DCR L
+MOV A,L
+CPI 0
+JZ koniec
+MOV B,C
+MVI A,10
+RST 1
+MVI A,13
+RST 1
+MOV A,H
+CPI 0
+JZ powtorz
+MOV A,L
+CPI 2
+JZ ZUCZY64
+JMP ZU2_CZY64
+
+koniec HLT
+tekst1 DB 'Konwerter liczby dziesietnej 8bit@'
+tekst2 DB ' ze znakiem na ZM, ZU1 i ZU2@'
+tekst3 DB 10,13,'Wymagany format: znak i 3 @'
+tekst4 DB 'cyfry(czyli z zakresu od +127 do@'
+tekst5 DB ' -128',10,13,'Podaj liczbe: @'
+
+
+
+ZUCZY64  
+	 MOV B,C  
+	 MOV A,B 
+	 SUI 64  
+	 JP J64  
+	 JM NJ64
+;  
+ZUCZY32  
+	 MOV A,B  
+	 SUI 32  
+	 JP J32  
+	 JM NJ32  
+;
+ZUCZY16  
+	 MOV A,B  
+	 SUI 16  
+	 JP J16  
+	 JM NJ16 
+; 
+ZUCZY8  
+	 MOV A,B  
+	 SUI 8  
+	 JP J8  
+	 JM NJ8
+;  
+ZUCZY4  
+	 MOV A,B  
+	 SUI 4  
+	 JP J4  
+	 JM NJ4  
+;
+ZUCZY2  
+	 MOV A,B  
+	 SUI 2  
+	 JP J2  
+	 JM NJ2
+;  
+ZUCZY1  
+	 MOV A,B  
+	 SUI 1  
+	 JP J1  
+	 JM NJ1  
+;--------------------ZU2----------
+;                                                                  
+ZU2_CZY64  
+	 MOV B,C  
+	 MOV E,D 
+	 MOV A,E  
+	 SUI 7
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 64  
+	 JP J64  
+	 JM NJ64  
+ZU2_CZY32  
+;
+	 MOV A,E  
+	 SUI 6 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 32  
+	 JP J32  
+	 JM NJ32  
+ZU2_CZY16  
+;
+	 MOV A,E  
+	 SUI 5 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 16  
+	 JP J16  
+	 JM NJ16  
+ZU2_CZY8  
+;
+	 MOV A,E  
+	 SUI 4 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 8  
+	 JP J8  
+	 JM NJ8  
+ZU2_CZY4  
+;
+	 MOV A,E  
+	 SUI 3 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 4  
+	 JP J4  
+	 JM NJ4  
+;
+ZU2_CZY2  
+	 MOV A,E  
+	 SUI 2 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 2  
+	 JP J2  
+	 JM NJ2  
+;
+ZU2_CZY1  
+	 MOV A,E  
+	 SUI 1 ;SPRAWDZENIE CZY NIE OSTATNIA 1  
+	 JP OSTATNIA1  
+	 MOV A,B  
+	 SUI 1  
+	 JP J1  
+	 JM NJ1  
+;
+;-----------------Jezeli ostatnia 1 (0)-------                                                      
+OSTATNIA1  
+	 MVI A,'1' ;WYPISZ 1  
+	 RST 1  
+	 DCR E  
+RESZTA  
+	 DCR E  
+	 MOV A,E  
+	 CP WYP1 ;A RESZTE WYPELNI 0  
+	 JP RESZTA  
+	 JM CZY_KONIEC  
+;                                                      
+;                                                          
+;          
+;                                                                         
+;                                                                 ;                                     
+J64  
+	 MOV B,A  
+	 MVI A,'1' ;WYPISANIE ZNAKU MINUS  
+	 RST 1 
+	 MOV A,B  
+	 MVI D,7 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2  
+	 JP ZUCZY32  
+	 JM ZU2_CZY32  
+;                                                                                    
+NJ64  
+	 ADI 64  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2  
+	 JP ZUCZY32  
+	 JM ZU2_CZY32  
+;                                                                                    
+J32  
+	 MVI D,6 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2  
+	 JP ZUCZY16  
+	 JM ZU2_CZY16  
+;                                                                                    
+NJ32  
+	 ADI 32  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2  
+	 JP ZUCZY16  
+	 JM ZU2_CZY16  
+;                                                                                    
+J16  
+	 MVI D,5 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2 ;SPRAWDZENIE CZY WRÓCIĆ DO ZU CZY ZU2  
+	 JP ZUCZY8  
+	 JM ZU2_CZY8  
+;                                                                                    
+NJ16  
+	 ADI 16  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2 
+	 JP ZUCZY8  
+	 JM ZU2_CZY8  
+;                                                                                    
+J8  
+	 MVI D,4 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2 
+	 JP ZUCZY4  
+	 JM ZU2_CZY4  
+;                                                                                    
+NJ8  
+	 ADI 8  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2
+	 JP ZUCZY4  
+	 JM ZU2_CZY4  
+;                                                                                    
+J4  
+	 MVI D,3 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2 
+	 JP ZUCZY2  
+	 JM ZU2_CZY2  
+;                                                                                    
+NJ4  
+	 ADI 4  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2  
+	 JP ZUCZY2  
+	 JM ZU2_CZY2  
+;                                                                                    
+J2  
+	 MVI D,2 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2   
+	 JP ZUCZY1  
+	 JM ZU2_CZY1  
+;                                                                                    
+NJ2  
+	 ADI 2  
+	 CALL WYP0  
+	 MOV B,A  
+	 MOV A,L  
+	 SUI 2   
+	 JP ZUCZY1  
+	 JM ZU2_CZY1  
+;                                                                            
+J1  
+	 MVI D,1 ;ZAPAMIETANIE WYSTAPIENIA 1  
+	 CALL WYP1  
+	 JMP CZY_KONIEC  
+;                                                                                    
+NJ1  
+	 ADI 1  
+	 CALL WYP0  
+	 JMP CZY_KONIEC  
+;
+;
+;----------Wypisanie 0------------                                                                    
+WYP1  
+	 MOV B,A  
+	 MVI A,'0'  
+	 RST 1  
+	 MOV A,B  
+	 RET  
+;
+;----------Wypisanie 1------------                                                                    
+WYP0  
+	 MOV B,A  
+	 MVI A,'1'  
+	 RST 1  
+	 MOV A,B  
+	 RET  
