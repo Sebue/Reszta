@@ -1,0 +1,49 @@
+@ECHO OFF
+:00
+echo.
+echo Menu
+echo.
+echo 1. Przenies katalog.
+echo 2. Tworzenie nowego uzytkownika.
+echo 3. Koniec.
+echo.
+set /p w="Wybor opcji: "
+IF %w%==1 GOTO 01 
+IF %w%==2 GOTO 02 
+IF %w%==3 GOTO 03
+
+:01
+set /p adr="Podaj sciezke katalogu: "
+set /p cel="Podaj sciezke docelowa: "
+mkdir %cel%
+xcopy /e %adr% %cel%
+erase /q /s %adr%
+rmdir %adr%
+echo.
+pause >>nul
+
+GOTO 00
+
+:02
+set /p dzial="Podaj dzial: "
+set /p user="Podaj uzytkownika: "
+IF NOT EXIST %dzial% GOTO 04
+IF EXIST %dzial%\%user% GOTO 05
+mkdir %dzial%\%user%
+echo Witaj, %user%, w dziale %dzial% naszej firmy >%dzial%\%user%\witaj.txt
+echo Dodano uzytkownika.
+pause >>null
+GOTO 00
+
+:03
+exit
+
+:04
+echo Zly dzial
+pause >>null
+GOTO 00
+
+:05
+echo Taki pracownik juz jest w tym dziale
+pause >>null
+GOTO 00
