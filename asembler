@@ -1,0 +1,47 @@
+.Model tiny
+.Code
+	        push 0b800h
+		pop es
+		push 1000h
+		pop ds
+		
+		
+		mov di,0
+		mov cx,2000
+pętla:
+		mov al,32
+		mov es:[di],al
+		inc di
+		mov al,13
+		mov es:[di],al
+		inc di
+		loop pętla
+
+		mov di,79
+		mov ah,65
+		mov bx,1
+		mov ds:[0],160
+		mov dl,25
+
+skok:		mov cx,bx
+
+lit:		inc di
+		mov es:[di],ah
+		mov al,25
+		inc di
+		mov es:[di],al
+		loop lit
+
+		sub ds:[0],4
+		add di, ds:[0]
+		inc ah
+		add bx,2
+		dec dl
+		CMP dl, 0
+		JNZ SKOK
+		               
+		mov 	ah,01h
+		int	21h
+      		mov         ah,4ch
+	        int	    21h
+		end
