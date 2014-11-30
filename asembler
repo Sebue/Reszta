@@ -2,9 +2,6 @@
 .Code
 	        push 0b800h
 		pop es
-		push 1000h
-		pop ds
-		
 		
 		mov di,0
 		mov cx,2000
@@ -20,7 +17,7 @@ pętla:
 		mov di,79
 		mov ah,65
 		mov bx,1
-		mov ds:[0],160
+		mov dx,160
 		mov al,25
 
 skok:		mov cx,bx
@@ -31,8 +28,8 @@ wyswietl:	inc di
 		mov es:[di],25
 		loop wyswietl
 
-		sub ds:[0],4
-		add di, ds:[0]
+		sub dx,4
+		add di, dx
 		inc ah
 		add bx,2
 		dec al
