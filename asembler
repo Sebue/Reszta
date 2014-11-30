@@ -25,12 +25,11 @@ pętla:
 
 skok:		mov cx,bx
 
-lit:		inc di
+wyswietl:	inc di
 		mov es:[di],ah
-		mov al,25
 		inc di
-		mov es:[di],al
-		loop lit
+		mov es:[di],25
+		loop wyswietl
 
 		sub ds:[0],4
 		add di, ds:[0]
