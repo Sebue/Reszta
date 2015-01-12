@@ -1,0 +1,206 @@
+Progr           segment
+                assume  cs:Progr, ds:dane, ss:stosik
+
+start:          mov     ax,dane
+                mov     ds,ax
+                mov     ax,stosik
+                mov     ss,ax
+                mov     sp,offset szczyt
+
+
+                mov bx,0
+                mov cx,0
+                call wezliczbe
+                call nowalinia
+                call czyujemna
+                mov cx,2D
+                call znajdz2
+                call odejmowanie
+                call wyrownaj
+                jmp koniec
+
+        czyujemna:
+                mov dx,cx
+                mov ah,02H
+                int 21h
+                mov dx,'.'
+                mov ah,02H
+                int 21h
+                ret
+        nowalinia:
+                mov dl,10D
+                mov ah,02H
+                int 21h
+                ret
+        wezliczbe:
+                mov dx,0
+                mov ax,0
+                mov ah,08H
+                int 21h
+                mov dl,al
+                cmp dx,'-'
+                jne jeden
+                mov cx,'1'
+                mov dx,'-'
+                mov ah,02H
+                int 21h
+            wezliczbe2:
+                mov dx,0
+                mov ax,0
+                mov ah,08H
+                int 21h
+                mov dl,al
+            zero:
+                cmp dx,'0'
+                jne jeden
+                cmp bx,0
+                je niepoprawnie
+                call razy10
+                jmp wezliczbe2
+            jeden:
+                cmp dx,'1'
+                jne dwa
+                mov si,1D
+                jmp poprawnie
+            dwa:
+                cmp dx,'2'
+                jne trzy
+                mov si,2D
+                jmp poprawnie
+            trzy:
+                cmp dx,'3'
+                jne cztery
+                mov si,3D
+                jmp poprawnie
+            cztery:
+                cmp dx,'4'
+                jne piec
+                mov si,4D
+                jmp poprawnie
+            piec:
+                cmp dx,'5'
+                jne szesc
+                mov si,5D
+                jmp poprawnie
+            skokdo1:
+                jmp wezliczbe
+            skokdo2:
+                jmp wezliczbe2
+            szesc:
+                cmp dx,'6'
+                jne siedem
+                mov si,6D
+                jmp poprawnie
+            siedem:
+                cmp dx,'7'
+                jne osiem
+                mov si,7D
+                jmp poprawnie
+            osiem:
+                cmp dx,'8'
+                jne dziewiec
+                mov si,8D
+                jmp poprawnie
+            dziewiec:
+                cmp dx,'9'
+                jne enterz
+                mov si,9D
+                jmp poprawnie
+            enterz:
+                cmp dx,0DH
+                jne niepoprawnie
+                cmp di,0D
+                je niepoprawnie
+                jmp koniecwpisywania
+            niepoprawnie:
+                cmp cx,0
+                je skokdo1
+                jmp wezliczbe2
+            poprawnie:
+                mov ah,02H
+                int 21h
+                call razy10
+                add bx,si
+                add di,1D
+                cmp di,4D
+                je koniecwpisywania
+                cmp cx,0
+                jne skokdo2
+                mov cx,'0'
+                jmp wezliczbe2
+            koniecwpisywania:
+                ret
+        razy10:
+                mov ax,10D
+                mul bx
+                mov bx,ax
+                ret
+        znajdz2:
+                cmp cx,bx
+                jg znalazlem
+                mov ax,2D
+                mov dx,0
+                mul cx
+                mov cx,ax
+                jmp znajdz2
+            znalazlem:
+                ret
+        odejmowanie:
+                call podzielcx
+                cmp cx,bx
+                jg pominodejmowanie
+                sub bx,cx
+                call wypisz1
+                jmp dalej
+            pominodejmowanie:
+                call wypisz0
+            dalej:
+                cmp bx,0
+                je bxpuste
+                jmp odejmowanie
+            bxpuste:
+                ret
+        wypisz1:
+                mov dl,'1'
+                mov ah,02H
+                int 21h
+                ret
+        wypisz0:
+                mov dl,'0'
+                mov ah,02H
+                int 21h
+                ret
+        podzielcx:
+                mov ax,cx
+                mov cx,2D
+                mov dx,0
+                div cx
+                mov cx,ax
+                ret
+        wyrownaj:
+                cmp cx,1D
+                je wyrownano
+                call podzielcx
+                mov dl,'0'
+                mov ah,02H
+                int 21h
+                jmp wyrownaj
+            wyrownano:
+                ret
+        koniec:
+                mov    ax,4C00h
+                int    21h
+
+
+Progr           ends
+
+dane            segment
+
+dane            ends
+
+stosik          segment
+                dw    100h dup(0)
+szczyt          Label word
+stosik          ends
+
+end start
