@@ -11,15 +11,58 @@ start:          mov     ax,dane
                 mov bx,0
                 mov cx,0
                 call wezliczbe
-                call nowalinia
-                call czyujemna
-                mov cx,2D
+				call sprawdzanie
+				mov liczba,bx
+petla:          call nowalinia
+                call znak
+                mov cx,2
+				mov bx,liczba
                 call znajdz2
                 call odejmowanie
                 call wyrownaj
+				call czy_ujemna
                 jmp koniec
 
-        czyujemna:
+
+
+	czy_ujemna:
+		inc zu
+		cmp ujemna,0
+		je dodatnia
+		cmp zu,1
+	;je TUTAJ DO ZU1
+		cmp zu,2
+	;je TUTAJ DO ZU2
+		ret
+
+	dodatnia:
+		cmp zu,3
+		je powrot
+		mov cx,'0'
+		jmp petla
+
+	powrot:
+		ret
+
+	sprawdzanie:
+		cmp cx,'1'
+		je ujemne
+		cmp bx,127
+		jg za_duza
+		ret
+		
+		ujemne:
+		cmp bx,126
+		jg za_duza
+		ret
+	
+	za_duza:
+		lea dx,error
+		mov ah,09h
+		int 21h	
+		JMP koniec
+
+        znak:
                 mov dx,cx
                 mov ah,02H
                 int 21h
@@ -28,10 +71,12 @@ start:          mov     ax,dane
                 int 21h
                 ret
         nowalinia:
-                mov dl,10D
+                mov dl,10
                 mov ah,02H
                 int 21h
                 ret
+
+
         wezliczbe:
                 mov dx,0
                 mov ax,0
@@ -40,8 +85,8 @@ start:          mov     ax,dane
                 mov dl,al
                 cmp dx,'-'
                 jne jeden
-                mov cx,'1'
-                mov dx,'-'
+                mov cx,'1'	;cx zapamiętuje "ujemność"
+				mov ujemna,1
                 mov ah,02H
                 int 21h
             wezliczbe2:
@@ -53,98 +98,100 @@ start:          mov     ax,dane
             zero:
                 cmp dx,'0'
                 jne jeden
-                cmp bx,0
-                je niepoprawnie
-                call razy10
-                jmp wezliczbe2
+                mov si,0
+                jmp poprawnie
             jeden:
                 cmp dx,'1'
                 jne dwa
-                mov si,1D
+                mov si,1
                 jmp poprawnie
             dwa:
                 cmp dx,'2'
                 jne trzy
-                mov si,2D
+                mov si,2
                 jmp poprawnie
             trzy:
                 cmp dx,'3'
                 jne cztery
-                mov si,3D
+                mov si,3
                 jmp poprawnie
             cztery:
                 cmp dx,'4'
                 jne piec
-                mov si,4D
+                mov si,4
                 jmp poprawnie
             piec:
                 cmp dx,'5'
                 jne szesc
-                mov si,5D
+                mov si,5
                 jmp poprawnie
-            skokdo1:
-                jmp wezliczbe
-            skokdo2:
-                jmp wezliczbe2
             szesc:
                 cmp dx,'6'
                 jne siedem
-                mov si,6D
+                mov si,6
                 jmp poprawnie
             siedem:
                 cmp dx,'7'
                 jne osiem
-                mov si,7D
+                mov si,7
                 jmp poprawnie
             osiem:
                 cmp dx,'8'
                 jne dziewiec
-                mov si,8D
+                mov si,8
                 jmp poprawnie
             dziewiec:
                 cmp dx,'9'
                 jne enterz
-                mov si,9D
+                mov si,9
                 jmp poprawnie
             enterz:
                 cmp dx,0DH
                 jne niepoprawnie
-                cmp di,0D
+                cmp di,0
                 je niepoprawnie
                 jmp koniecwpisywania
-            niepoprawnie:
+            niepoprawnie:		;nie pozwala nie wpisać liczby, bądź podać błędną
                 cmp cx,0
                 je skokdo1
                 jmp wezliczbe2
             poprawnie:
                 mov ah,02H
                 int 21h
-                call razy10
-                add bx,si
-                add di,1D
-                cmp di,4D
-                je koniecwpisywania
+                call razy10	;przesunięcie liczb na następną pozycje
+                add bx,si	;liczba jaka wyjdzie
+                add di,1
+                cmp di,4
+                je koniecwpisywania	;jeśli podane zostały już cztery znaki
                 cmp cx,0
                 jne skokdo2
                 mov cx,'0'
                 jmp wezliczbe2
             koniecwpisywania:
                 ret
+            skokdo1:
+                jmp wezliczbe
+            skokdo2:
+                jmp wezliczbe2
+
+
         razy10:
-                mov ax,10D
+                mov ax,10
                 mul bx
                 mov bx,ax
                 ret
+
         znajdz2:
                 cmp cx,bx
                 jg znalazlem
-                mov ax,2D
-                mov dx,0
+                mov ax,2
+                mov dx,0	;starsza część bitu mnożenia, trzeba wyzerować
                 mul cx
                 mov cx,ax
                 jmp znajdz2
             znalazlem:
                 ret
+
         odejmowanie:
                 call podzielcx
                 cmp cx,bx
@@ -172,13 +219,14 @@ start:          mov     ax,dane
                 ret
         podzielcx:
                 mov ax,cx
-                mov cx,2D
+                mov cx,2
                 mov dx,0
                 div cx
                 mov cx,ax
                 ret
-        wyrownaj:
-                cmp cx,1D
+
+        wyrownaj:		;dodaje potrzebne zera
+                cmp cx,1
                 je wyrownano
                 call podzielcx
                 mov dl,'0'
@@ -196,6 +244,10 @@ Progr           ends
 
 dane            segment
 
+		error db 10,13,'Wystapil blad w danych wejsciowych.$'
+		zu dw 0
+		ujemna dw 0
+		liczba dw 0
 dane            ends
 
 stosik          segment
